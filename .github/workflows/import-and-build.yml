@@ -1,4 +1,4 @@
-name: Import and build offline n-back
+name: Build Sentience n-back offline
 on:
   workflow_dispatch:
   push:
@@ -11,7 +11,7 @@ on:
 permissions:
   contents: write
 concurrency:
-  group: n-back-import-build
+  group: sentience-n-back-build
   cancel-in-progress: false
 jobs:
   build:
@@ -45,9 +45,9 @@ jobs:
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add index.html N-Back-Offline.html .nojekyll extra-training.html extra-training-runtime.js number-speech.js number-speech-data.js NUMBER-SPEECH-ASSETS.md assets/number-voice scripts/build-number-speech.py SOURCE.json validation/unit-tests.json validation/browser-tests.json
+          git add index.html Sentience-N-Back-Offline.html N-Back-Offline.html source/extra-training.html .nojekyll extra-training.html extra-training-runtime.js number-speech.js number-speech-data.js NUMBER-SPEECH-ASSETS.md assets/number-voice scripts/build-number-speech.py SOURCE.json validation/unit-tests.json validation/browser-tests.json
           if ! git diff --cached --quiet; then
-            git commit -m 'Copy complete Ordered Number N-back and bundle offline app with recorded voice'
+            git commit -m 'Build Sentience n-back with consistent branding and complete offline audio'
             git push origin HEAD:main
           fi
       - name: Assemble downloadable repository
@@ -58,7 +58,7 @@ jobs:
       - name: Upload complete offline HTML and repository
         uses: actions/upload-artifact@v4
         with:
-          name: n-back-complete-offline
+          name: sentience-n-back-complete-offline
           path: artifact/
           include-hidden-files: true
           retention-days: 30
