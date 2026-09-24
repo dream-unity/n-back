@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Import a pinned copy once; rebuild the complete, single-file app offline."""
+"""Build Sentience n-back as a complete, self-contained offline application."""
 from __future__ import annotations
 import argparse
 import hashlib
@@ -12,6 +12,11 @@ import urllib.request
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = 'mike-stack1982364/Ontological-Worlds'
 COMMIT = 'f34066d0b7466f7477f9d077cff72cbb27a9e47e'
+APP_NAME = 'Sentience n-back'
+APP_TITLE = APP_NAME + ' — Dream Unity'
+DOWNLOAD = 'Sentience-N-Back-Offline.html'
+DESCRIPTION = ('Sentience n-back by Dream Unity: an offline number-memory trainer '
+               'with adjustable difficulty, interference and recorded number audio.')
 FILES = (
     'extra-training.html', 'extra-training-runtime.js', 'number-speech.js',
     'number-speech-data.js', 'NUMBER-SPEECH-ASSETS.md',
@@ -24,6 +29,11 @@ KNOWN = {
     'number-speech.js': '2e0c45acd8e888efb45fe474f9dcbc746d2d69a4',
     'number-speech-data.js': '7ad10b714d92b4a0435055ed061efb6a974b0760',
 }
+
+
+def source_path(name: str) -> Path:
+    # Keep the exact original page for provenance; every playable root page is branded.
+    return ROOT / ('source/extra-training.html' if name == 'extra-training.html' else name)
 
 
 def blob_sha(data: bytes) -> str:
@@ -53,7 +63,7 @@ def import_source() -> None:
         data = get(f'https://raw.githubusercontent.com/{SOURCE}/{COMMIT}/{name}')
         if blob_sha(data) != entry['sha']:
             raise ValueError(f'Source hash mismatch: {name}')
-        path = ROOT / name
+        path = source_path(name)
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(data)
         manifest['files'][name] = {'git_blob_sha': entry['sha'], 'bytes': len(data)}
@@ -62,10 +72,10 @@ def import_source() -> None:
 
 MENU = '''
 <main id="training-menu" class="container">
-<header><div><p class="brand">DREAM UNITY · N-BACK</p><h1 id="menu-title">Extra Training</h1></div></header>
+<header><div><p class="brand">DREAM UNITY</p><h1 id="menu-title">Sentience n-back</h1></div></header>
 <section class="controls menu-card">
-<a id="open-training" class="training-portal" href="#training"><span>Open ordered<br>number n-back</span><span aria-hidden="true">›</span></a>
-<p class="menu-note">The complete Ordered Number N-back trainer from Ontological Worlds, in an independent, offline application.</p>
+<a id="open-training" class="training-portal" href="#training"><span>Open Sentience n-back</span><span aria-hidden="true">›</span></a>
+<p class="menu-note">Sentience n-back is Dream Unity’s offline number-memory trainer, with ordered sequences, adjustable interference and recorded number audio.</p>
 <p class="help">All training code and recorded number audio are embedded in this file. No internet connection, account or installation is required to play.</p>
 </section>
 <section class="controls guide" aria-labelledby="guide-title">
@@ -81,9 +91,10 @@ MENU = '''
 
 EXTRA_CSS = '''
 [hidden]{display:none!important}
+h1{ text-transform:none }
 .brand{font-size:.76rem;font-weight:800;letter-spacing:.16em;color:var(--muted);margin:0 0 8px}
 .menu-card{text-align:center;padding:30px 22px}
-.training-portal{display:flex;align-items:center;justify-content:space-between;gap:28px;max-width:550px;margin:0 auto;padding:24px 30px;border:3px solid #176aa8;border-radius:24px;background:linear-gradient(125deg,#0b4f88,#49aee7);box-shadow:0 12px 26px rgba(15,65,112,.17);color:#fff;text-decoration:none;text-align:left;font-size:clamp(1.35rem,4vw,2.2rem);font-weight:900;line-height:1.12;text-transform:uppercase}
+.training-portal{display:flex;align-items:center;justify-content:space-between;gap:28px;max-width:550px;margin:0 auto;padding:24px 30px;border:3px solid #176aa8;border-radius:24px;background:linear-gradient(125deg,#0b4f88,#49aee7);box-shadow:0 12px 26px rgba(15,65,112,.17);color:#fff;text-decoration:none;text-align:left;font-size:clamp(1.35rem,4vw,2.2rem);font-weight:900;line-height:1.12;text-transform:none}
 .training-portal:hover{filter:brightness(1.04)}
 .training-portal:focus-visible,button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid #176aa8;outline-offset:4px}
 .menu-note{max-width:620px;margin:22px auto 12px;line-height:1.55;color:var(--muted)}
@@ -111,7 +122,7 @@ NAVIGATION = '''
     }
     menu.hidden = training;
     trainer.hidden = !training;
-    document.title = training ? 'Ordered Number N-back — Dream Unity' : 'N-back — Dream Unity';
+    document.title = 'Sentience n-back — Dream Unity';
     window.scrollTo(0, 0);
     if (moveFocus) {
       if (training) document.getElementById('training-title').focus({preventScroll: true});
@@ -126,22 +137,47 @@ NAVIGATION = '''
 
 def build() -> None:
     manifest = json.loads((ROOT / 'SOURCE.json').read_text(encoding='utf-8'))
+    # Migrate the original page once without changing its bytes or recorded hash.
+    original_page = source_path('extra-training.html')
+    if not original_page.exists():
+        data = (ROOT / 'extra-training.html').read_bytes()
+        if blob_sha(data) != manifest['files']['extra-training.html']['git_blob_sha']:
+            raise ValueError('Cannot preserve an unverified original training page')
+        original_page.parent.mkdir(parents=True, exist_ok=True)
+        original_page.write_bytes(data)
     # Fail rather than silently bundle an incomplete or changed import.
     for name, entry in manifest['files'].items():
-        if blob_sha((ROOT / name).read_bytes()) != entry['git_blob_sha']:
+        if blob_sha(source_path(name).read_bytes()) != entry['git_blob_sha']:
             raise ValueError(f'Imported file changed: {name}')
-    source_html = (ROOT / 'extra-training.html').read_text(encoding='utf-8')
+    source_html = original_page.read_text(encoding='utf-8')
     scripts = re.findall(r'<script src="([^\"]+)"></script>', source_html)
     expected = ['number-speech-data.js', 'number-speech.js', 'extra-training-runtime.js']
     if [src.split('?')[0] for src in scripts] != expected:
         raise ValueError('Unexpected source script dependencies')
-    document = source_html.replace('<title>Extra Training — Ordered Number N-back</title>', '<title>N-back — Dream Unity</title>')
+    document, title_count = re.subn(r'<title>.*?</title>', '<title>' + html.escape(APP_TITLE) + '</title>', source_html, count=1, flags=re.S)
+    if title_count != 1:
+        raise ValueError('Missing application title')
+    metadata = '\n'.join([
+        '<meta name="application-name" content="' + html.escape(APP_NAME, quote=True) + '">',
+        '<meta name="description" content="' + html.escape(DESCRIPTION, quote=True) + '">',
+        '<meta name="author" content="Dream Unity">',
+        '<meta property="og:type" content="website">',
+        '<meta property="og:site_name" content="Dream Unity">',
+        '<meta property="og:title" content="' + html.escape(APP_TITLE, quote=True) + '">',
+        '<meta property="og:description" content="' + html.escape(DESCRIPTION, quote=True) + '">',
+        '<meta name="twitter:card" content="summary">',
+        '<meta name="twitter:title" content="' + html.escape(APP_TITLE, quote=True) + '">',
+        '<meta name="twitter:description" content="' + html.escape(DESCRIPTION, quote=True) + '">',
+    ])
+    document = document.replace('</head>', metadata + '\n</head>', 1)
     document = document.replace('</style>', EXTRA_CSS + '\n</style>', 1)
     marker = '<main class="container">'
     if document.count(marker) != 1:
         raise ValueError('Unexpected source page structure')
     document = document.replace(marker, MENU + '<main id="trainer" class="container" hidden>', 1)
-    document = document.replace('<h1>Extra Training', '<h1 id="training-title" tabindex="-1">Extra Training', 1)
+    document, heading_count = re.subn(r'<h1>.*?</h1>', '<h1 id="training-title" tabindex="-1">' + html.escape(APP_NAME) + '</h1>', document, count=1, flags=re.S)
+    if heading_count != 1:
+        raise ValueError('Missing trainer heading')
     document = document.replace('class="back" href="index.html">← Main Training', 'id="back-to-menu" class="back" href="#menu">← Main Menu', 1)
     document = document.replace('<div class="timer">', '<p class="help key-guide">F / J: Match · D / K: No Match · Escape: Stop</p>\n<div class="timer">', 1)
     credits = (ROOT / 'assets/number-voice/CREDITS.txt').read_text(encoding='utf-8')
@@ -160,14 +196,15 @@ def build() -> None:
         code = re.sub(r'</script', lambda _: '<\\/script', code, flags=re.I)
         document = document.replace(f'<script src="{src}"></script>', f'<script data-bundled-file="{name}">\n{code}\n</script>', 1)
     document = document.replace('</body>', '<script>\n' + NAVIGATION + '\n</script>\n</body>', 1)
-    document = document.replace('<head>', '<head>\n<!-- Independent n-back copy; source ' + SOURCE + '@' + COMMIT + '. Rebuild: python3 scripts/build-offline.py -->', 1)
+    document = document.replace('<head>', '<head>\n<!-- Sentience n-back; preserved source ' + SOURCE + '@' + COMMIT + '. Rebuild: python3 scripts/build-offline.py -->', 1)
     if re.search(r'<script[^>]+\bsrc\s*=', document, re.I):
         raise ValueError('External script remains in offline build')
     payload = document.encode('utf-8')
-    for name in ('index.html', 'N-Back-Offline.html'):
+    # Preserve existing links while giving every playable entry point the new brand.
+    for name in ('index.html', DOWNLOAD, 'N-Back-Offline.html', 'extra-training.html'):
         (ROOT / name).write_bytes(payload)
     (ROOT / '.nojekyll').write_text('', encoding='utf-8')
-    print(f'Built complete offline HTML: {len(payload):,} bytes; SHA-256 {hashlib.sha256(payload).hexdigest()}')
+    print(f'Built Sentience n-back offline HTML: {len(payload):,} bytes; SHA-256 {hashlib.sha256(payload).hexdigest()}')
 
 
 if __name__ == '__main__':
