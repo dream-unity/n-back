@@ -1,0 +1,57 @@
+name: Import and build offline n-back
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/import-and-build.yml'
+      - 'scripts/build-offline.py'
+      - 'tests/offline.test.cjs'
+permissions:
+  contents: write
+concurrency:
+  group: n-back-import-build
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Import the verified source once; otherwise rebuild locally
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -f SOURCE.json ]; then
+            python3 scripts/build-offline.py
+          else
+            python3 scripts/build-offline.py --import-source
+          fi
+      - name: Validate source fidelity, matching, speech and self-contained HTML
+        run: node tests/offline.test.cjs
+      - name: Commit complete independent application
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html N-Back-Offline.html .nojekyll extra-training.html extra-training-runtime.js number-speech.js number-speech-data.js NUMBER-SPEECH-ASSETS.md assets/number-voice scripts/build-number-speech.py SOURCE.json validation/unit-tests.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'Copy complete Ordered Number N-back and bundle offline app with recorded voice'
+            git push origin HEAD:main
+          fi
+      - name: Assemble downloadable repository
+        shell: bash
+        run: |
+          mkdir -p artifact
+          git archive HEAD | tar -x -C artifact
+      - name: Upload complete offline HTML and repository
+        uses: actions/upload-artifact@v4
+        with:
+          name: n-back-complete-offline
+          path: artifact/
+          include-hidden-files: true
+          retention-days: 30
