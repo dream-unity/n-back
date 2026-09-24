@@ -7,6 +7,7 @@ on:
       - '.github/workflows/import-and-build.yml'
       - 'scripts/build-offline.py'
       - 'tests/offline.test.cjs'
+      - 'tests/browser-offline.py'
 permissions:
   contents: write
 concurrency:
@@ -15,7 +16,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -32,13 +33,19 @@ jobs:
           fi
       - name: Validate source fidelity, matching, speech and self-contained HTML
         run: node tests/offline.test.cjs
+      - name: Prepare Chromium for standalone-file validation
+        run: |
+          python3 -m pip install --disable-pip-version-check playwright==1.57.0
+          python3 -m playwright install --with-deps chromium
+      - name: Play the isolated HTML with the browser offline
+        run: python3 tests/browser-offline.py
       - name: Commit complete independent application
         shell: bash
         run: |
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add index.html N-Back-Offline.html .nojekyll extra-training.html extra-training-runtime.js number-speech.js number-speech-data.js NUMBER-SPEECH-ASSETS.md assets/number-voice scripts/build-number-speech.py SOURCE.json validation/unit-tests.json
+          git add index.html N-Back-Offline.html .nojekyll extra-training.html extra-training-runtime.js number-speech.js number-speech-data.js NUMBER-SPEECH-ASSETS.md assets/number-voice scripts/build-number-speech.py SOURCE.json validation/unit-tests.json validation/browser-tests.json
           if ! git diff --cached --quiet; then
             git commit -m 'Copy complete Ordered Number N-back and bundle offline app with recorded voice'
             git push origin HEAD:main
