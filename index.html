@@ -1,11 +1,11 @@
 <!doctype html>
 <html lang="en-AU">
 <head>
-<!-- Independent n-back copy; source mike-stack1982364/Ontological-Worlds@f34066d0b7466f7477f9d077cff72cbb27a9e47e. Rebuild: python3 scripts/build-offline.py -->
+<!-- Sentience n-back; preserved source mike-stack1982364/Ontological-Worlds@f34066d0b7466f7477f9d077cff72cbb27a9e47e. Rebuild: python3 scripts/build-offline.py -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#ffffff">
-<title>N-back — Dream Unity</title>
+<title>Sentience n-back — Dream Unity</title>
 <style>
 :root{--bg:#fff;--panel:#f4f8fc;--ink:#0b1728;--muted:#43566d;--blue:#124f8c;--blue2:#176aa8;--green:#086b3a;--red:#b42318}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -34,9 +34,10 @@ button:disabled{opacity:.42;cursor:not-allowed}
 @media(max-width:560px){header{align-items:flex-start;flex-direction:column}.stats{grid-template-columns:repeat(2,1fr)}.responses{flex-direction:column}}
 
 [hidden]{display:none!important}
+h1{ text-transform:none }
 .brand{font-size:.76rem;font-weight:800;letter-spacing:.16em;color:var(--muted);margin:0 0 8px}
 .menu-card{text-align:center;padding:30px 22px}
-.training-portal{display:flex;align-items:center;justify-content:space-between;gap:28px;max-width:550px;margin:0 auto;padding:24px 30px;border:3px solid #176aa8;border-radius:24px;background:linear-gradient(125deg,#0b4f88,#49aee7);box-shadow:0 12px 26px rgba(15,65,112,.17);color:#fff;text-decoration:none;text-align:left;font-size:clamp(1.35rem,4vw,2.2rem);font-weight:900;line-height:1.12;text-transform:uppercase}
+.training-portal{display:flex;align-items:center;justify-content:space-between;gap:28px;max-width:550px;margin:0 auto;padding:24px 30px;border:3px solid #176aa8;border-radius:24px;background:linear-gradient(125deg,#0b4f88,#49aee7);box-shadow:0 12px 26px rgba(15,65,112,.17);color:#fff;text-decoration:none;text-align:left;font-size:clamp(1.35rem,4vw,2.2rem);font-weight:900;line-height:1.12;text-transform:none}
 .training-portal:hover{filter:brightness(1.04)}
 .training-portal:focus-visible,button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid #176aa8;outline-offset:4px}
 .menu-note{max-width:620px;margin:22px auto 12px;line-height:1.55;color:var(--muted)}
@@ -47,14 +48,24 @@ button:disabled{opacity:.42;cursor:not-allowed}
 #training-title:focus{outline:none}
 
 </style>
+<meta name="application-name" content="Sentience n-back">
+<meta name="description" content="Sentience n-back by Dream Unity: an offline number-memory trainer with adjustable difficulty, interference and recorded number audio.">
+<meta name="author" content="Dream Unity">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Dream Unity">
+<meta property="og:title" content="Sentience n-back — Dream Unity">
+<meta property="og:description" content="Sentience n-back by Dream Unity: an offline number-memory trainer with adjustable difficulty, interference and recorded number audio.">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Sentience n-back — Dream Unity">
+<meta name="twitter:description" content="Sentience n-back by Dream Unity: an offline number-memory trainer with adjustable difficulty, interference and recorded number audio.">
 </head>
 <body>
 
 <main id="training-menu" class="container">
-<header><div><p class="brand">DREAM UNITY · N-BACK</p><h1 id="menu-title">Extra Training</h1></div></header>
+<header><div><p class="brand">DREAM UNITY</p><h1 id="menu-title">Sentience n-back</h1></div></header>
 <section class="controls menu-card">
-<a id="open-training" class="training-portal" href="#training"><span>Open ordered<br>number n-back</span><span aria-hidden="true">›</span></a>
-<p class="menu-note">The complete Ordered Number N-back trainer from Ontological Worlds, in an independent, offline application.</p>
+<a id="open-training" class="training-portal" href="#training"><span>Open Sentience n-back</span><span aria-hidden="true">›</span></a>
+<p class="menu-note">Sentience n-back is Dream Unity’s offline number-memory trainer, with ordered sequences, adjustable interference and recorded number audio.</p>
 <p class="help">All training code and recorded number audio are embedded in this file. No internet connection, account or installation is required to play.</p>
 </section>
 <section class="controls guide" aria-labelledby="guide-title">
@@ -67,7 +78,7 @@ button:disabled{opacity:.42;cursor:not-allowed}
 </section>
 </main>
 <main id="trainer" class="container" hidden>
-<header><h1 id="training-title" tabindex="-1">Extra Training — Ordered Number N-back</h1><a id="back-to-menu" class="back" href="#menu">← Main Menu</a></header>
+<header><h1 id="training-title" tabindex="-1">Sentience n-back</h1><a id="back-to-menu" class="back" href="#menu">← Main Menu</a></header>
 <div id="clock" class="clock">00:00</div>
 <section class="controls">
 <p class="help" style="font-size:.9rem;margin:0 0 16px">Digits 1–9. A match exists only when the same number appears in the same sequence position as it did exactly N trials earlier. Repeated numbers in different positions are interference, not matches.</p>
@@ -1880,7 +1891,7 @@ Creative Commons Notice
     }
     menu.hidden = training;
     trainer.hidden = !training;
-    document.title = training ? 'Ordered Number N-back — Dream Unity' : 'N-back — Dream Unity';
+    document.title = 'Sentience n-back — Dream Unity';
     window.scrollTo(0, 0);
     if (moveFocus) {
       if (training) document.getElementById('training-title').focus({preventScroll: true});

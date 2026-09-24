@@ -1,6 +1,6 @@
 {
   "passed": true,
-  "assertions": 542632,
+  "assertions": 542640,
   "generatedTrials": 117450,
   "testedNLevels": [
     1,
@@ -15,6 +15,6 @@
   "embeddedVoiceClips": 63,
   "audioSequences": 147,
   "observedMatchRate": 0.34905555555555556,
-  "htmlBytes": 1468972,
-  "htmlSha256": "53362669999b26de90a059116857415e337e573071acc2e5b04fd2467aa4b27a"
+  "htmlBytes": 1469866,
+  "htmlSha256": "2b75f2c3249f4f4619df3b91b90ac2e380882dce3d59b0fce6b7e83e30b21d2a"
 }
