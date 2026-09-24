@@ -42,7 +42,7 @@ NO_AUDIO = "Object.defineProperty(window,'AudioContext',{value:undefined,configu
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--html', type=Path, default=ROOT / 'N-Back-Offline.html')
+    parser.add_argument('--html', type=Path, default=ROOT / 'Sentience-N-Back-Offline.html')
     parser.add_argument('--output', type=Path, default=ROOT / 'validation')
     parser.add_argument('--chromium', default=None)
     parser.add_argument('--document-mode', action='store_true')
@@ -54,8 +54,8 @@ def main():
         if not condition:
             raise AssertionError(label)
         checks.append(label)
-    with tempfile.TemporaryDirectory(prefix='n-back-isolated-') as temporary:
-        isolated = Path(temporary) / 'N-Back-Offline.html'
+    with tempfile.TemporaryDirectory(prefix='sentience-n-back-isolated-') as temporary:
+        isolated = Path(temporary) / 'Sentience-N-Back-Offline.html'
         isolated.write_bytes(payload)
         with sync_playwright() as playwright:
             browser = playwright.chromium.launch(executable_path=args.chromium, headless=True, args=['--no-sandbox'])
@@ -89,9 +89,17 @@ def main():
 
             context, page = new_page(clock=True)
             check(page.locator('#training-menu').is_visible() and not page.locator('#trainer').is_visible(), 'Separate menu initially visible')
+            check(page.title() == 'Sentience n-back — Dream Unity', 'Menu browser title uses Sentience n-back')
+            check(page.locator('#menu-title').inner_text() == 'Sentience n-back', 'Menu heading uses Sentience n-back')
+            check(page.locator('#open-training').inner_text().replace('›', '').strip() == 'Open Sentience n-back', 'Portal uses Sentience n-back')
+            check(page.locator('meta[property="og:title"]').get_attribute('content') == 'Sentience n-back — Dream Unity', 'Share title uses Sentience n-back')
+
             page.screenshot(path=str(args.output / 'menu.png'), full_page=True)
             open_training(page)
             check(page.locator('#trainer').is_visible() and not page.locator('#training-menu').is_visible(), 'Portal opens trainer internally')
+            check(page.title() == 'Sentience n-back — Dream Unity', 'Training browser title preserves branding')
+            check(page.locator('#training-title').inner_text() == 'Sentience n-back', 'Training heading uses Sentience n-back')
+
             expected_options={'n':20,'count':3,'response':7,'session':8,'probability':6,'interference':5,'rate':7,'spacing':7,'volume':4}
             for control, count in expected_options.items():
                 check(page.locator('#'+control+' option').count()==count, 'All options preserved: '+control)
@@ -128,6 +136,7 @@ def main():
             page.locator('#back-to-menu').click()
             page.wait_for_function('document.getElementById("trainer").hidden')
             check(not state(page)['running'] and page.locator('#training-menu').is_visible(), 'Returning to menu stops session')
+            check(page.title() == 'Sentience n-back — Dream Unity', 'Returning to menu preserves branding')
             open_training(page)
             check(page.locator('#n').is_enabled() and page.locator('#start').is_enabled(), 'Controls unlocked after menu return')
 
