@@ -1,0 +1,42 @@
+{
+  "repository": "mike-stack1982364/Ontological-Worlds",
+  "commit": "f34066d0b7466f7477f9d077cff72cbb27a9e47e",
+  "files": {
+    "extra-training.html": {
+      "git_blob_sha": "f759bcea052ad41e7930f794905b1dd204b06c71",
+      "bytes": 8932
+    },
+    "extra-training-runtime.js": {
+      "git_blob_sha": "f83c9a80959422d194bd6f3104e5213352ee1a3a",
+      "bytes": 16191
+    },
+    "number-speech.js": {
+      "git_blob_sha": "2e0c45acd8e888efb45fe474f9dcbc746d2d69a4",
+      "bytes": 7916
+    },
+    "number-speech-data.js": {
+      "git_blob_sha": "7ad10b714d92b4a0435055ed061efb6a974b0760",
+      "bytes": 1406317
+    },
+    "NUMBER-SPEECH-ASSETS.md": {
+      "git_blob_sha": "85fcd522d4fa749388e676354995769030ab2adc",
+      "bytes": 4755
+    },
+    "assets/number-voice/LICENSE.txt": {
+      "git_blob_sha": "c258d856d756ae27eb0ae63832335b2573a4dd2d",
+      "bytes": 19890
+    },
+    "assets/number-voice/CREDITS.txt": {
+      "git_blob_sha": "fc6bd8c38d4c9fa0c8463b58f4813ec92b227f37",
+      "bytes": 156
+    },
+    "assets/number-voice/source.json": {
+      "git_blob_sha": "fb1e0317810885cd4e4ab102744c3e31e1f3d772",
+      "bytes": 208966
+    },
+    "scripts/build-number-speech.py": {
+      "git_blob_sha": "b426dcc762227b11cfae4f4cc4e911dfeab3a948",
+      "bytes": 11796
+    }
+  }
+}
