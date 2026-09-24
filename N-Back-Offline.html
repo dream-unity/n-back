@@ -41,9 +41,10 @@ button:disabled{opacity:.42;cursor:not-allowed}
 .training-portal:focus-visible,button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid #176aa8;outline-offset:4px}
 .menu-note{max-width:620px;margin:22px auto 12px;line-height:1.55;color:var(--muted)}
 .guide{line-height:1.65}.guide h2{margin-top:0;color:var(--blue);font-size:1.15rem}
-.offline-credits{padding:10px 0 22px}.offline-credits summary{cursor:pointer;font-weight:700;color:var(--blue)}
+.offline-credits{margin:0 auto;padding:10px 0 22px}.offline-credits summary{cursor:pointer;font-weight:700;color:var(--blue)}
 .offline-credits pre{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;line-height:1.55;padding:14px;background:var(--panel);border-radius:10px}
 .key-guide{text-align:center;margin-top:12px}
+#training-title:focus{outline:none}
 
 </style>
 </head>
@@ -59,7 +60,7 @@ button:disabled{opacity:.42;cursor:not-allowed}
 <section class="controls guide" aria-labelledby="guide-title">
 <h2 id="guide-title">How to play</h2>
 <p>Remember each ordered sequence of 1–3 digits. Select <strong>Match</strong> when <strong>at least one digit</strong> is the same in the <strong>same position</strong> as it was exactly N trials earlier. Otherwise select <strong>No Match</strong>. A digit repeated in a different position is not a match.</p>
-<p>For example, when the target is <strong>1, 2, 3</strong>, <strong>8, 2, 7</strong> is a match in position two. <strong>2, 3, 1</strong> is not a match.</p>
+<p>For example, if the N-back target is <strong>1, 2, 3</strong>, then the sequence <strong>8, 2, 7</strong> is a match in position two. <strong>2, 3, 1</strong> is not a match.</p>
 <p>The first N trials fill your memory and are not scored. When speech is enabled, the complete sequence plays before the response timer starts. Missing a scored response counts against accuracy.</p>
 <p><strong>Keyboard:</strong> F or J = Match; D or K = No Match; Escape = Stop. Use the Pause/Resume button to pause. Returning to this menu stops an active session.</p>
 <p class="help">Haptics operate only on devices and browsers that support vibration. This copy preserves the source trainer’s game rules, options, scoring and recorded voice.</p>
@@ -1867,22 +1868,27 @@ Creative Commons Notice
   'use strict';
   const menu = document.getElementById('training-menu');
   const trainer = document.getElementById('trainer');
-  function showView() {
+  function showView(moveFocus = true) {
     const training = location.hash === '#training';
     if (!training && !trainer.hidden) {
       // Call the source handler even during an idle Test Speech playback.
       const stop = document.getElementById('stop');
+      const feedback = document.getElementById('feedback');
+      const testing = feedback.textContent === 'TESTING AUDIO';
       if (typeof stop.onclick === 'function') stop.onclick();
+      if (testing) feedback.textContent = '';
     }
     menu.hidden = training;
     trainer.hidden = !training;
     document.title = training ? 'Ordered Number N-back — Dream Unity' : 'N-back — Dream Unity';
     window.scrollTo(0, 0);
-    if (training) document.getElementById('training-title').focus({preventScroll: true});
-    else document.getElementById('open-training').focus({preventScroll: true});
+    if (moveFocus) {
+      if (training) document.getElementById('training-title').focus({preventScroll: true});
+      else document.getElementById('open-training').focus({preventScroll: true});
+    }
   }
-  window.addEventListener('hashchange', showView);
-  showView();
+  window.addEventListener('hashchange', () => showView(true));
+  showView(false);
 })();
 
 </script>
