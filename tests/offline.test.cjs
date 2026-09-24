@@ -14,7 +14,7 @@ function random() { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; return
 
 const source = JSON.parse(fs.readFileSync(path.join(root, 'SOURCE.json')));
 for (const [name, item] of Object.entries(source.files)) {
-  const bytes = fs.readFileSync(path.join(root, name));
+  const bytes = fs.readFileSync(path.join(root, name === 'extra-training.html' ? 'source/extra-training.html' : name));
   const hash = crypto.createHash('sha1').update('blob ' + bytes.length + '\0').update(bytes).digest('hex');
   check(hash === item.git_blob_sha, 'Byte-for-byte source copy: ' + name);
 }
@@ -74,6 +74,15 @@ for (const rate of Object.keys(speech.RATES)) {
 }
 const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 check(html === fs.readFileSync(path.join(root, 'N-Back-Offline.html'), 'utf8'), 'Download and repository app are identical');
+check(html === fs.readFileSync(path.join(root, 'Sentience-N-Back-Offline.html'), 'utf8'), 'Branded download and repository app are identical');
+check(html === fs.readFileSync(path.join(root, 'extra-training.html'), 'utf8'), 'Legacy training entry point carries the same brand');
+check(html.includes('<title>Sentience n-back — Dream Unity</title>'), 'Browser title uses Sentience n-back');
+check(html.includes('<h1 id="menu-title">Sentience n-back</h1>'), 'Menu title uses Sentience n-back');
+check(html.includes('<h1 id="training-title" tabindex="-1">Sentience n-back</h1>'), 'Training title uses Sentience n-back');
+check(html.includes('Open Sentience n-back'), 'Portal uses Sentience n-back');
+check(html.includes('property="og:title" content="Sentience n-back — Dream Unity"'), 'Share metadata uses Sentience n-back');
+check(!/Extra Training|Ordered Number N-back|Open ordered/i.test(html), 'No previous product names in the playable app');
+
 check(!/<script\b[^>]*\bsrc\s*=/i.test(html), 'No external JavaScript');
 check(!/<link\b[^>]*\brel=["']stylesheet/i.test(html), 'No external stylesheets');
 check(!/<(?:iframe|img|audio|video)\b[^>]*\bsrc\s*=/i.test(html), 'No external runtime media');
